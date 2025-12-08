@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dekselwissel</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+.app { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+label { font-weight: bold; display:block; margin-top:10px; }
+input, select { width: 100%; padding: 8px; margin-top:5px; }
+button { padding: 10px; width: 100%; font-size: 18px; margin-top:15px; border: none; border-radius: 10px; background: #007bff; color: white; }
+#output { margin-top: 20px; font-size: 18px; }
+</style>
+</head>
+<body>
+<div class="app">
+<h2>📦 Dekselwissel</h2>
+
+<label>Inhoud blik (33 of 50):</label>
+<input type="number" id="volume" placeholder="33 of 50">
+
+<label>Rest op teller (liter):</label>
+<input type="number" id="rest" placeholder="Aantal liter">
+
+<label>Deksel nu:</label>
+<select id="deksel_nu">
+  <option value="UDD00001">UDD00001</option>
+  <option value="VAD0048">VAD0048</option>
+  <option value="VAD0053">VAD0053</option>
+  <option value="ANDERE">ANDERE</option>
+</select>
+
+<label>Deksel na ombouw:</label>
+<select id="deksel_na">
+  <option value="VAD0048">VAD0048</option>
+  <option value="VAD0053">VAD0053</option>
+  <option value="ANDERE">ANDERE</option>
+</select>
+
+<button onclick="bereken()">Bereken</button>
+
+<div id="output"></div>
+</div>
+
+<script>
+function bereken() {
+    let volume = parseInt(document.getElementById("volume").value);
+    let rest = parseFloat(document.getElementById("rest").value);
+    let nu = document.getElementById("deksel_nu").value.trim();
+    let na = document.getElementById("deksel_na").value.trim();
+    let out = "";
+
+    let factor = (volume === 33) ? 3 : 2;
+    let pakken = (rest * factor) / 680;
+    let plus10 = pakken + 10;
+    let min10 = pakken - 10;
+
+    function afronden(x) { return x.toFixed(2); }
+
+    if (nu === "UDD00001" && na === "VAD0048") {
+        out += "Aantal pakken: " + afronden(pakken) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    } else if (nu === "VAD0048" && na === "VAD0053") {
+        out += "Aantal pakken: " + afronden(min10) + "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
+    } else if (na === "VAD0048") {
+        out += "Aantal pakken: " + afronden(plus10) + "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
+    } else {
+        out += "Aantal pakken: " + afronden(pakken) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    }
+
+    document.getElementById("output").innerHTML = out;
+}
+</script>
+</body>
+</html>
