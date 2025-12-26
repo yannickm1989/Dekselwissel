@@ -56,11 +56,12 @@ button {
     margin-bottom:15px;
 }
 
+/* Tabs: inactief = lichtgrijs, actief = groen */
 .tab-buttons button {
     flex:1;
     font-size:16px;
-    background:#28a745;
-    color:white;
+    background:#e0e0e0;
+    color:#333;
     padding:8px;
     border-radius:8px;
     border:none;
@@ -68,31 +69,35 @@ button {
 }
 
 .tab-buttons button.active {
-    background:#19692c;
+    background:#28a745;
+    color:white;
     font-weight:bold;
 }
 
-/* Titel met logo */
+/* Titel met logo – tekst exact gecentreerd */
 .title-bar {
-    display:flex;
-    align-items:center;
-    background:#28a745;
-    color:white;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:15px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
 }
 
 .title-bar img {
-    height:50px;
-    width:auto;
-    margin-right:10px;
-    object-fit:contain;
+    position: absolute;
+    left: 10px;
+    height: 50px;
+    width: auto;
+    object-fit: contain;
 }
 
 .title-bar h2 {
-    margin:0;
-    font-size:20px;
+    margin: 0;
+    font-size: 20px;
 }
 </style>
 </head>
@@ -103,7 +108,7 @@ button {
     <!-- TITEL -->
     <div class="title-bar">
         <img src="ym.png" alt="YM">
-        <h2> Deksel Wissel</h2>
+        <h2>Deksel Wissel</h2>
     </div>
 
     <!-- TABS -->
@@ -152,7 +157,6 @@ function vulDropdowns() {
 }
 vulDropdowns();
 
-// Tabs
 let huidigBlik = 3;
 
 document.getElementById("tabBlik3").onclick = () => {
