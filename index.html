@@ -3,148 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dekselwissel</title>
-
+<title>Blik Wissel</title>
 <style>
 body { font-family: Arial; padding: 20px; background: #f5f5f5; }
-
-.app {
-  max-width: 400px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.tabs {
-  display: flex;
-  margin-bottom: 15px;
-}
-
-.tabs button {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  background: #e0e0e0;
-  border-radius: 8px 8px 0 0;
-}
-
-.tabs button.active {
-  background: #2e7d32;
-  color: white;
-}
-
+.app { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
 label { font-weight: bold; display:block; margin-top:10px; }
 input, select { width: 100%; padding: 8px; margin-top:5px; }
-
-button.calc {
-  padding: 10px;
-  width: 100%;
-  font-size: 18px;
-  margin-top:15px;
-  border: none;
-  border-radius: 10px;
-  background: #2e7d32;
-  color: white;
-}
-
+button { padding: 10px; width: 100%; font-size: 18px; margin-top:15px; border: none; border-radius: 10px; background: #28a745; color: white; cursor:pointer;}
 #output { margin-top: 20px; font-size: 18px; }
+.tab-buttons { display:flex; gap:10px; margin-bottom:15px; }
+.tab-buttons button { flex:1; font-size:16px; background:#28a745; color:white; padding:8px; border-radius:8px; border:none; cursor:pointer;}
+.tab-buttons button.active { background:#19692c; font-weight:bold; }
 </style>
 </head>
-
 <body>
 <div class="app">
+  <h2 style="background:#28a745; color:white; padding:10px; border-radius:8px;">📦 Blik Wissel</h2>
 
-<h2>📦 Dekselwissel</h2>
+  <div class="tab-buttons">
+    <button id="tabBlik3" class="active">BLIK3</button>
+    <button id="tabBlik4">BLIK4</button>
+  </div>
 
-<div class="tabs">
-  <button id="blik3" class="active" onclick="setBlik(3)">BLIK 3</button>
-  <button id="blik4" onclick="setBlik(4)">BLIK 4</button>
-</div>
+  <label>Inhoud blik (33 of 50):</label>
+  <input type="number" id="volume" placeholder="33 of 50">
 
-<label>Inhoud blik (33 of 50):</label>
-<input type="number" id="volume" placeholder="33 of 50">
+  <label>Rest op teller (liter):</label>
+  <input type="number" id="rest" placeholder="Aantal liter">
 
-<label>Rest op teller (liter):</label>
-<input type="number" id="rest" placeholder="Aantal liter">
+  <label>Deksel nu:</label>
+  <select id="deksel_nu"></select>
 
-<label>Deksel nu:</label>
-<select id="deksel_nu">
-  <option value="UDD00001">UDD00001</option>
-  <option value="VAD0048">VAD0048</option>
-  <option value="VAD0053">VAD0053</option>
-  <option value="VAD0070">VAD0070</option>
-  <option value="ANDERE">ANDERE</option>
-</select>
+  <label>Deksel na ombouw:</label>
+  <select id="deksel_na"></select>
 
-<label>Deksel na ombouw:</label>
-<select id="deksel_na">
-  <option value="UDD00001">UDD00001</option>
-  <option value="VAD0048">VAD0048</option>
-  <option value="VAD0053">VAD0053</option>
-  <option value="VAD0070">VAD0070</option>
-  <option value="ANDERE">ANDERE</option>
-</select>
+  <button onclick="bereken()">Bereken</button>
 
-<button class="calc" onclick="bereken()">Bereken</button>
-
-<div id="output"></div>
+  <div id="output"></div>
 </div>
 
 <script>
-let blikType = 3;
+const deksels = ["UDD00001","VAD0048","VAD0053","VAD0070"]; // Voeg hier nieuwe deksels toe
 
-function setBlik(type) {
-  blikType = type;
-  document.getElementById("blik3").classList.remove("active");
-  document.getElementById("blik4").classList.remove("active");
-  document.getElementById("blik" + type).classList.add("active");
-  document.getElementById("output").innerHTML = "";
+const dekselNu = document.getElementById("deksel_nu");
+const dekselNa = document.getElementById("deksel_na");
+
+// vul dropdowns automatisch
+function vulDropdowns() {
+    dekselNu.innerHTML = "";
+    dekselNa.innerHTML = "";
+    deksels.forEach(d=>{
+        const opt1 = document.createElement("option");
+        opt1.value=d; opt1.text=d;
+        dekselNu.appendChild(opt1);
+        const opt2 = document.createElement("option");
+        opt2.value=d; opt2.text=d;
+        dekselNa.appendChild(opt2);
+    });
 }
+vulDropdowns();
+
+// tabblad keuze
+let huidigBlik = 3;
+document.getElementById("tabBlik3").addEventListener("click", ()=>{
+    huidigBlik=3;
+    document.getElementById("tabBlik3").classList.add("active");
+    document.getElementById("tabBlik4").classList.remove("active");
+});
+document.getElementById("tabBlik4").addEventListener("click", ()=>{
+    huidigBlik=4;
+    document.getElementById("tabBlik4").classList.add("active");
+    document.getElementById("tabBlik3").classList.remove("active");
+});
 
 function bereken() {
-  let volume = parseInt(document.getElementById("volume").value);
-  let rest = parseFloat(document.getElementById("rest").value);
-  let nu = document.getElementById("deksel_nu").value.trim();
-  let na = document.getElementById("deksel_na").value.trim();
+    let volume = parseInt(document.getElementById("volume").value);
+    let rest = parseFloat(document.getElementById("rest").value);
+    let nu = dekselNu.value.trim();
+    let na = dekselNa.value.trim();
+    let out = "";
 
-  let factor = (volume === 33) ? 3 : 2;
-  let pakken = (rest * factor) / 680;
-  let plus10 = pakken + 10;
-  let min10 = pakken - 10;
+    let factor = (volume === 33) ? 3 : 2;
+    let pakken = (rest * factor) / 680;
 
-  let resultaat = pakken;
-  let melding = "<span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    // speciale regels
+    let plus10 = pakken + 10;
+    let min10 = pakken - 10;
 
-  if (nu === "VAD0070" || na === "VAD0070") {
-    resultaat = pakken;
-  }
-  else if (nu === "UDD00001" && na === "VAD0048") {
-    resultaat = pakken;
-  }
-  else if (nu === "VAD0048" && na === "VAD0053") {
-    resultaat = min10;
-    melding = "<span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
-  }
-  else if (na === "VAD0048") {
-    resultaat = plus10;
-    melding = "<span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
-  }
+    if ((nu==="UDD00001" && na==="VAD0048") || (nu==="VAD0048" && na==="VAD0053")) {
+        pakken = min10; // bestaande ±10 regel
+        out += "Aantal pakken: " + pakken.toFixed(2) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    } else if (nu==="VAD0070" || na==="VAD0070") {
+        // normale formule, scheiden
+        out += "Aantal pakken: " + pakken.toFixed(2) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    } else if (na==="VAD0048") {
+        out += "Aantal pakken: " + plus10.toFixed(2) + "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
+    } else {
+        out += "Aantal pakken: " + pakken.toFixed(2) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    }
 
-  // 🔴 CORRECTIE VOOR BLIK 4
-  if (blikType === 4) {
-    resultaat = resultaat - 2;
-  }
+    // BLIK4 correctie
+    if (huidigBlik===4) {
+        let match = out.match(/Aantal pakken: ([\d.]+)/);
+        if (match) {
+            let val = parseFloat(match[1])-2;
+            out = out.replace(/Aantal pakken: [\d.]+/, "Aantal pakken: "+val.toFixed(2));
+        }
+    }
 
-  document.getElementById("output").innerHTML =
-    "<b>Blik " + blikType + "</b><br>" +
-    "Aantal pakken: " + resultaat.toFixed(2) + "<br>" +
-    melding;
+    document.getElementById("output").innerHTML = out;
 }
 </script>
-
 </body>
 </html>
