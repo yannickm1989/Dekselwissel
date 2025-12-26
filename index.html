@@ -3,105 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brouwerij Martens Deksel Wissel</title>
+<title>Deksel Wissel</title>
 <style>
 body { font-family: Arial; padding: 20px; background: #f5f5f5; }
 .app { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
 label { font-weight: bold; display:block; margin-top:10px; }
 input, select { width: 100%; padding: 8px; margin-top:5px; }
-button { padding: 10px; width: 100%; font-size: 18px; margin-top:15px; border: none; border-radius: 10px; background: #28a745; color: white; }
+button { padding: 10px; width: 100%; font-size: 18px; margin-top:15px; border: none; border-radius: 10px; background: #28a745; color: white; cursor:pointer;}
 #output { margin-top: 20px; font-size: 18px; }
 .tab-buttons { display:flex; gap:10px; margin-bottom:15px; }
-.tab-buttons button { flex:1; font-size:16px; padding:8px; border-radius:8px; border:none; cursor:pointer; }
-.tab-active { background:#28a745; color:white; }
-.tab-inactive { background:#e5e5e5; color:#333; }
+.tab-buttons button { flex:1; font-size:16px; background:#28a745; color:white; padding:8px; border-radius:8px; border:none; cursor:pointer;}
+.tab-buttons button.active { background:#19692c; font-weight:bold; }
+.title-bar {
+    display:flex; 
+    align-items:center; 
+    background:#28a745; 
+    color:white; 
+    padding:10px; 
+    border-radius:8px; 
+    margin-bottom:15px;
+}
+.title-bar img {
+    height:40px; 
+    margin-right:10px;
+}
+.title-bar h2 {
+    margin:0; 
+    font-size:20px;
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-<h2 style="background:#28a745; color:white; padding:10px; border-radius:8px;">📦 Brouwerij Martens Deksel Wissel</h2>
+  <!-- Titel met logo -->
+  <div class="title-bar">
+    <img src="0a4df16b-395e-4de0-9d30-2327cb576983.png" alt="Martens Logo">
+    <h2>📦 Deksel Wissel</h2>
+  </div>
 
-<div class="tab-buttons">
-  <button id="blik3Btn" class="tab-active">BLIK 3</button>
-  <button id="blik4Btn" class="tab-inactive">BLIK 4</button>
-</div>
+  <!-- Tabbladen -->
+  <div class="tab-buttons">
+    <button id="tabBlik3" class="active">BLIK3</button>
+    <button id="tabBlik4">BLIK4</button>
+  </div>
 
-<label>Inhoud blik (33 of 50):</label>
-<input type="number" id="volume" placeholder="33 of 50">
+  <label>Inhoud blik (33 of 50):</label>
+  <input type="number" id="volume" placeholder="33 of 50">
 
-<label>Rest op teller (liter):</label>
-<input type="number" id="rest" placeholder="Aantal liter">
+  <label>Rest op teller (liter):</label>
+  <input type="number" id="rest" placeholder="Aantal liter">
 
-<label>Deksel nu:</label>
-<select id="deksel_nu">
-  <option value="UDD00001">UDD00001</option>
-  <option value="VAD0048">VAD0048</option>
-  <option value="VAD0053">VAD0053</option>
-  <option value="VAD0070">VAD0070</option>
-  <option value="ANDERE">ANDERE</option>
-</select>
+  <label>Deksel nu:</label>
+  <select id="deksel_nu"></select>
 
-<label>Deksel na ombouw:</label>
-<select id="deksel_na">
-  <option value="UDD00001">UDD00001</option>
-  <option value="VAD0048">VAD0048</option>
-  <option value="VAD0053">VAD0053</option>
-  <option value="VAD0070">VAD0070</option>
-  <option value="ANDERE">ANDERE</option>
-</select>
+  <label>Deksel na ombouw:</label>
+  <select id="deksel_na"></select>
 
-<button onclick="bereken()">Bereken</button>
+  <button onclick="bereken()">Bereken</button>
 
-<div id="output"></div>
+  <div id="output"></div>
 </div>
 
 <script>
-let currentBlik = 'BLIK3';
+const deksels = ["UDD00001","VAD0048","VAD0053","VAD0070"]; // Voeg hier nieuwe deksels toe
 
-const blik3Btn = document.getElementById('blik3Btn');
-const blik4Btn = document.getElementById('blik4Btn');
+const dekselNu = document.getElementById("deksel_nu");
+const dekselNa = document.getElementById("deksel_na");
 
-blik3Btn.addEventListener('click', ()=> {
-    currentBlik = 'BLIK3';
-    blik3Btn.className='tab-active';
-    blik4Btn.className='tab-inactive';
+// Vul dropdowns automatisch
+function vulDropdowns() {
+    dekselNu.innerHTML = "";
+    dekselNa.innerHTML = "";
+    deksels.forEach(d=>{
+        const opt1 = document.createElement("option");
+        opt1.value=d; opt1.text=d;
+        dekselNu.appendChild(opt1);
+        const opt2 = document.createElement("option");
+        opt2.value=d; opt2.text=d;
+        dekselNa.appendChild(opt2);
+    });
+}
+vulDropdowns();
+
+// Tabblad keuze
+let huidigBlik = 3;
+document.getElementById("tabBlik3").addEventListener("click", ()=>{
+    huidigBlik=3;
+    document.getElementById("tabBlik3").classList.add("active");
+    document.getElementById("tabBlik4").classList.remove("active");
 });
-
-blik4Btn.addEventListener('click', ()=> {
-    currentBlik = 'BLIK4';
-    blik4Btn.className='tab-active';
-    blik3Btn.className='tab-inactive';
+document.getElementById("tabBlik4").addEventListener("click", ()=>{
+    huidigBlik=4;
+    document.getElementById("tabBlik4").classList.add("active");
+    document.getElementById("tabBlik3").classList.remove("active");
 });
 
 function bereken() {
     let volume = parseInt(document.getElementById("volume").value);
     let rest = parseFloat(document.getElementById("rest").value);
-    let nu = document.getElementById("deksel_nu").value.trim();
-    let na = document.getElementById("deksel_na").value.trim();
+    let nu = dekselNu.value.trim();
+    let na = dekselNa.value.trim();
     let out = "";
+
+    // Validatie
+    if (volume !== 33 && volume !== 50) {
+        alert("Voer een geldig volume in: 33 of 50");
+        return;
+    }
+    if (rest <= 0) {
+        alert("Rest op teller moet groter dan 0 zijn");
+        return;
+    }
 
     let factor = (volume === 33) ? 3 : 2;
     let pakken = (rest * factor) / 680;
+
+    // speciale regels
     let plus10 = pakken + 10;
     let min10 = pakken - 10;
 
-    if(currentBlik === 'BLIK4') {
-        pakken -= 2;
-        plus10 -= 2;
-        min10 -= 2;
+    if ((nu==="UDD00001" && na==="VAD0048") || (nu==="VAD0048" && na==="VAD0053")) {
+        pakken = min10; 
+        out += "Aantal pakken: " + pakken.toFixed(2) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    } else if (nu==="VAD0070" || na==="VAD0070") {
+        out += "Aantal pakken: " + pakken.toFixed(2) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    } else if (na==="VAD0048") {
+        out += "Aantal pakken: " + plus10.toFixed(2) + "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
+    } else {
+        out += "Aantal pakken: " + pakken.toFixed(2) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
     }
 
-    function afronden(x) { return x.toFixed(2); }
-
-    if ((nu === "UDD00001" && na === "VAD0048") || (nu === "VAD0070" && na === "UDD00001") || (nu === "UDD00001" && na === "VAD0070") || (nu === "VAD0070" && na === "VAD0070")) {
-        out += "Aantal pakken: " + afronden(pakken) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
-    } else if (nu === "VAD0048" && na === "VAD0053") {
-        out += "Aantal pakken: " + afronden(min10) + "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
-    } else if (na === "VAD0048") {
-        out += "Aantal pakken: " + afronden(plus10) + "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
-    } else {
-        out += "Aantal pakken: " + afronden(pakken) + "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    // BLIK4 correctie
+    if (huidigBlik===4) {
+        let match = out.match(/Aantal pakken: ([\d.]+)/);
+        if (match) {
+            let val = parseFloat(match[1])-2;
+            out = out.replace(/Aantal pakken: [\d.]+/, "Aantal pakken: "+val.toFixed(2));
+        }
     }
 
     document.getElementById("output").innerHTML = out;
