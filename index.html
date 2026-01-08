@@ -171,14 +171,9 @@ document.getElementById("tabBlik4").onclick = () => {
     tabBlik3.classList.remove("active");
 };
 
-<script>
 function bereken() {
-    const volumeInput = document.getElementById("volume");
-    const restInput = document.getElementById("rest");
-    const output = document.getElementById("output");
-
-    let volume = parseInt(volumeInput.value);
-    let rest = parseFloat(restInput.value);
+    let volume = parseInt(volume.value);
+    let rest = parseFloat(rest.value);
     let nu = dekselNu.value;
     let na = dekselNa.value;
 
@@ -186,7 +181,7 @@ function bereken() {
         alert("Volume moet 33 of 50 zijn");
         return;
     }
-    if (isNaN(rest) || rest <= 0) {
+    if (rest <= 0) {
         alert("Rest moet groter zijn dan 0");
         return;
     }
@@ -225,4 +220,3 @@ function bereken() {
 </script>
 </body>
 </html>
-
