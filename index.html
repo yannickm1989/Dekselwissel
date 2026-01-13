@@ -123,7 +123,8 @@ button {
 <label>Deksel na ombouw:</label>
 <select id="deksel_na"></select>
 
-<button onclick="bereken()">Bereken</button>
+<!-- 🔧 HIER ZIT DE FIX -->
+<button type="button" onclick="bereken()">Bereken</button>
 
 <div id="output"></div>
 </div>
@@ -170,11 +171,11 @@ function bereken() {
     const nu = dekselNu.value;
     const na = dekselNa.value;
 
-    if (![33, 50].includes(volume)) {
+    if (![33,50].includes(volume)) {
         alert("Volume moet 33 of 50 zijn");
         return;
     }
-    if (rest <= 0 || isNaN(rest)) {
+    if (isNaN(rest) || rest <= 0) {
         alert("Rest moet groter zijn dan 0");
         return;
     }
@@ -191,16 +192,13 @@ function bereken() {
         pakken = min10;
         resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
         <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
-    } 
-    else if (nu==="VAD0070" || na==="VAD0070") {
+    } else if (nu==="VAD0070" || na==="VAD0070") {
         resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
         <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
-    } 
-    else if (na==="VAD0048") {
+    } else if (na==="VAD0048") {
         resultaat = `Aantal pakken: ${plus10.toFixed(2)}<br>
         <span style="color:green">Nieuwe deksels mogen gewoon achteraan</span>`;
-    } 
-    else {
+    } else {
         resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
         <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
     }
