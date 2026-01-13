@@ -90,11 +90,6 @@ button {
     left: 10px;
     height: 50px;
 }
-
-.title-bar h2 {
-    margin: 0;
-    font-size: 20px;
-}
 </style>
 </head>
 
@@ -112,10 +107,10 @@ button {
 </div>
 
 <label>Inhoud blik (33 of 50):</label>
-<input type="number" id="volume" placeholder="33 of 50">
+<input type="number" id="volume">
 
 <label>Rest op teller (liter):</label>
-<input type="number" id="rest" placeholder="Aantal liter">
+<input type="number" id="rest">
 
 <label>Deksel nu:</label>
 <select id="deksel_nu"></select>
@@ -123,14 +118,19 @@ button {
 <label>Deksel na ombouw:</label>
 <select id="deksel_na"></select>
 
-<!-- 🔧 HIER ZIT DE FIX -->
 <button type="button" onclick="bereken()">Bereken</button>
 
 <div id="output"></div>
 </div>
 
 <script>
-const deksels = ["UDD00001","VAD0048","VAD0053","VAD0070"];
+const deksels = [
+    "UDD00001",
+    "VAD0048",
+    "VAD0053",
+    "VAD0070",
+    "VAD0077"
+];
 
 const dekselNu = document.getElementById("deksel_nu");
 const dekselNa = document.getElementById("deksel_na");
@@ -141,17 +141,15 @@ const output = document.getElementById("output");
 const tabBlik3 = document.getElementById("tabBlik3");
 const tabBlik4 = document.getElementById("tabBlik4");
 
+let huidigBlik = 3;
+
 function vulDropdowns() {
-    dekselNu.innerHTML = "";
-    dekselNa.innerHTML = "";
     deksels.forEach(d => {
         dekselNu.add(new Option(d, d));
         dekselNa.add(new Option(d, d));
     });
 }
 vulDropdowns();
-
-let huidigBlik = 3;
 
 tabBlik3.onclick = () => {
     huidigBlik = 3;
@@ -168,49 +166,46 @@ tabBlik4.onclick = () => {
 function bereken() {
     const volume = parseInt(volumeInput.value);
     const rest = parseFloat(restInput.value);
-    const nu = dekselNu.value;
-    const na = dekselNa.value;
 
-    if (![33,50].includes(volume)) {
-        alert("Volume moet 33 of 50 zijn");
-        return;
-    }
-    if (isNaN(rest) || rest <= 0) {
-        alert("Rest moet groter zijn dan 0");
+    if (![33,50].includes(volume) || isNaN(rest) || rest <= 0) {
+        alert("Controleer volume en restwaarde");
         return;
     }
 
     let factor = volume === 33 ? 3 : 2;
     let pakken = (rest * factor) / 680;
 
-    let plus10 = pakken + 10;
-    let min10 = pakken - 10;
+    const nu = dekselNu.value;
+    const na = dekselNa.value;
 
-    let resultaat = "";
+    let melding = "<span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+    let berekeningInfo = "basis pakken";
 
-    if ((nu==="UDD00001" && na==="VAD0048") || (nu==="VAD0048" && na==="VAD0053")) {
-        pakken = min10;
-        resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
-        <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
-    } else if (nu==="VAD0070" || na==="VAD0070") {
-        resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
-        <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
-    } else if (na==="VAD0048") {
-        resultaat = `Aantal pakken: ${plus10.toFixed(2)}<br>
-        <span style="color:green">Nieuwe deksels mogen gewoon achteraan</span>`;
-    } else {
-        resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
-        <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
+    // SPECIFIEKE OVERGANGEN
+    if (nu === "VAD0048" && na === "VAD0053") {
+        pakken -= 10;
+        melding = "<span style='color:green'>Nieuwe deksels mogen achteraan</span>";
+        berekeningInfo = "basis pakken −10";
+    }
+    else if (nu === "VAD0053" && na === "VAD0048") {
+        pakken += 10;
+        melding = "<span style='color:green'>Nieuwe deksels mogen achteraan</span>";
+        berekeningInfo = "basis pakken +10";
     }
 
+    // BLIK4 CORRECTIE
     if (huidigBlik === 4) {
-        resultaat = resultaat.replace(
-            /Aantal pakken: ([\d.]+)/,
-            (_, v) => "Aantal pakken: " + (parseFloat(v) - 2).toFixed(2)
-        );
+        pakken -= 2;
+        berekeningInfo += ", −2";
     }
 
-    output.innerHTML = resultaat;
+    output.innerHTML = `
+        Aantal pakken: <b>${pakken.toFixed(2)}</b><br>
+        ${melding}<br>
+        <span style="color:gray;font-size:14px">
+            (${berekeningInfo})
+        </span>
+    `;
 }
 </script>
 </body>
