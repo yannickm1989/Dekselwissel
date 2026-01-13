@@ -56,7 +56,6 @@ button {
     margin-bottom:15px;
 }
 
-/* Tabs: inactief = lichtgrijs, actief = groen */
 .tab-buttons button {
     flex:1;
     font-size:16px;
@@ -74,7 +73,6 @@ button {
     font-weight:bold;
 }
 
-/* Titel met logo – tekst exact gecentreerd */
 .title-bar {
     position: relative;
     display: flex;
@@ -91,8 +89,6 @@ button {
     position: absolute;
     left: 10px;
     height: 50px;
-    width: auto;
-    object-fit: contain;
 }
 
 .title-bar h2 {
@@ -105,33 +101,31 @@ button {
 <body>
 <div class="app">
 
-    <!-- TITEL -->
-    <div class="title-bar">
-        <img src="ym.png" alt="YM">
-        <h2>Deksel Wissel</h2>
-    </div>
+<div class="title-bar">
+    <img src="ym.png" alt="YM">
+    <h2>Deksel Wissel</h2>
+</div>
 
-    <!-- TABS -->
-    <div class="tab-buttons">
-        <button id="tabBlik3" class="active">BLIK3</button>
-        <button id="tabBlik4">BLIK4</button>
-    </div>
+<div class="tab-buttons">
+    <button id="tabBlik3" class="active">BLIK3</button>
+    <button id="tabBlik4">BLIK4</button>
+</div>
 
-    <label>Inhoud blik (33 of 50):</label>
-    <input type="number" id="volume" placeholder="33 of 50">
+<label>Inhoud blik (33 of 50):</label>
+<input type="number" id="volume" placeholder="33 of 50">
 
-    <label>Rest op teller (liter):</label>
-    <input type="number" id="rest" placeholder="Aantal liter">
+<label>Rest op teller (liter):</label>
+<input type="number" id="rest" placeholder="Aantal liter">
 
-    <label>Deksel nu:</label>
-    <select id="deksel_nu"></select>
+<label>Deksel nu:</label>
+<select id="deksel_nu"></select>
 
-    <label>Deksel na ombouw:</label>
-    <select id="deksel_na"></select>
+<label>Deksel na ombouw:</label>
+<select id="deksel_na"></select>
 
-    <button onclick="bereken()">Bereken</button>
+<button onclick="bereken()">Bereken</button>
 
-    <div id="output"></div>
+<div id="output"></div>
 </div>
 
 <script>
@@ -139,73 +133,76 @@ const deksels = ["UDD00001","VAD0048","VAD0053","VAD0070"];
 
 const dekselNu = document.getElementById("deksel_nu");
 const dekselNa = document.getElementById("deksel_na");
+const volumeInput = document.getElementById("volume");
+const restInput = document.getElementById("rest");
+const output = document.getElementById("output");
+
+const tabBlik3 = document.getElementById("tabBlik3");
+const tabBlik4 = document.getElementById("tabBlik4");
 
 function vulDropdowns() {
     dekselNu.innerHTML = "";
     dekselNa.innerHTML = "";
-    deksels.forEach(d=>{
-        let o1 = document.createElement("option");
-        o1.value = d;
-        o1.text = d;
-        dekselNu.appendChild(o1);
-
-        let o2 = document.createElement("option");
-        o2.value = d;
-        o2.text = d;
-        dekselNa.appendChild(o2);
+    deksels.forEach(d => {
+        dekselNu.add(new Option(d, d));
+        dekselNa.add(new Option(d, d));
     });
 }
 vulDropdowns();
 
 let huidigBlik = 3;
 
-document.getElementById("tabBlik3").onclick = () => {
+tabBlik3.onclick = () => {
     huidigBlik = 3;
     tabBlik3.classList.add("active");
     tabBlik4.classList.remove("active");
 };
 
-document.getElementById("tabBlik4").onclick = () => {
+tabBlik4.onclick = () => {
     huidigBlik = 4;
     tabBlik4.classList.add("active");
     tabBlik3.classList.remove("active");
 };
 
 function bereken() {
-    let volume = parseInt(volume.value);
-    let rest = parseFloat(rest.value);
-    let nu = dekselNu.value;
-    let na = dekselNa.value;
+    const volume = parseInt(volumeInput.value);
+    const rest = parseFloat(restInput.value);
+    const nu = dekselNu.value;
+    const na = dekselNa.value;
 
-    if (![33,50].includes(volume)) {
+    if (![33, 50].includes(volume)) {
         alert("Volume moet 33 of 50 zijn");
         return;
     }
-    if (rest <= 0) {
+    if (rest <= 0 || isNaN(rest)) {
         alert("Rest moet groter zijn dan 0");
         return;
     }
 
-    let factor = (volume === 33) ? 3 : 2;
+    let factor = volume === 33 ? 3 : 2;
     let pakken = (rest * factor) / 680;
 
-    let resultaat = "";
     let plus10 = pakken + 10;
     let min10 = pakken - 10;
 
+    let resultaat = "";
+
     if ((nu==="UDD00001" && na==="VAD0048") || (nu==="VAD0048" && na==="VAD0053")) {
         pakken = min10;
-        resultaat = "Aantal pakken: " + pakken.toFixed(2) +
-            "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
-    } else if (nu==="VAD0070" || na==="VAD0070") {
-        resultaat = "Aantal pakken: " + pakken.toFixed(2) +
-            "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
-    } else if (na==="VAD0048") {
-        resultaat = "Aantal pakken: " + plus10.toFixed(2) +
-            "<br><span style='color:green'>Nieuwe deksels mogen gewoon achteraan</span>";
-    } else {
-        resultaat = "Aantal pakken: " + pakken.toFixed(2) +
-            "<br><span style='color:red'>Leeg laten lopen + kleur scheiden</span>";
+        resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
+        <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
+    } 
+    else if (nu==="VAD0070" || na==="VAD0070") {
+        resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
+        <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
+    } 
+    else if (na==="VAD0048") {
+        resultaat = `Aantal pakken: ${plus10.toFixed(2)}<br>
+        <span style="color:green">Nieuwe deksels mogen gewoon achteraan</span>`;
+    } 
+    else {
+        resultaat = `Aantal pakken: ${pakken.toFixed(2)}<br>
+        <span style="color:red">Leeg laten lopen + kleur scheiden</span>`;
     }
 
     if (huidigBlik === 4) {
